@@ -14,6 +14,7 @@ COMMENT_COLOR=$(tput setaf 3)
 # --- FUNCTIONS ---
 
 function cleanup() {
+    stty echo
     echo -e "\n\n${TITLE_COLOR}Exiting...${RESET_COLOR}"
     tput cnorm # Show cursor
     exit 0
@@ -37,7 +38,7 @@ function display_menu() {
 function colorize_text() {
     local text="$1"
     text=$(echo "$text" | sed -E "s/\b(echo|function|array|foreach|as|if|else|true|false|new)\b/${KEYWORD_COLOR}&${RESET_COLOR}/g")
-    text=$(echo "$text" | sed -E "s/(\\$[a-zA-Z_][a-zA-Z0-9_]*)/${VARIABLE_COLOR}&${RESET_COLOR}/g")
+    text=$(echo "$text" | sed -E "s/(\$[a-zA-Z_][a-zA-Z0-9_]*)/${VARIABLE_COLOR}&${RESET_COLOR}/g")
     text=$(echo "$text" | sed -E "s/(\"[^\"]*\")/${STRING_COLOR}&${RESET_COLOR}/g")
     text=$(echo "$text" | sed -E "s/(#.*|\\/\\/.*)/${COMMENT_COLOR}&${RESET_COLOR}/g")
     echo "$text"
@@ -84,6 +85,7 @@ while true; do
     colorized_content=$(colorize_text "$file_content")
     tput civis && clear
 
+    stty -echo
     i=0
     while [ "$i" -lt "${#colorized_content}" ]; do
         char="${colorized_content:$i:1}"
@@ -106,6 +108,7 @@ while true; do
             break 
         fi
     done
+    stty echo
 
     # --- POST-TYPING DECISION LOOP ---
     tput cnorm
